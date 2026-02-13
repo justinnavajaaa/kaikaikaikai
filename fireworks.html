@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fireworks Finale 🎆</title>
+  <style>
+    :root {
+      --sky-top: #050816;
+      --sky-bottom: #12053a;
+      --accent: #ff9bd4;
+      --text-main: #ffffff;
+      --card-bg: rgba(10, 10, 25, 0.85);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      background: radial-gradient(circle at 20% 20%, #1b173a, #050816 55%, #02010a);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Soft horizon gradient */
+    .horizon {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40vh;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Static starfield */
+    .stars-layer {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 20%, rgba(255, 255, 255, 0.9) 0, transparent 50%),
+        radial-gradient(1px 1px at 80% 10%, rgba(255, 255, 255, 0.7) 0, transparent 50%),
+        radial-gradient(1px 1px at 30% 70%, rgba(255, 255, 255, 0.6) 0, transparent 50%),
+        radial-gradient(1px 1px at 60% 40%, rgba(255, 255, 255, 0.8) 0, transparent 50%);
+      opacity: 0.9;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* Twinkling stars on top */
+    .twinkle {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(2px 2px at 15% 30%, rgba(255, 255, 255, 0.9) 0, transparent 50%),
+        radial-gradient(2px 2px at 75% 60%, rgba(255, 255, 255, 0.9) 0, transparent 50%),
+        radial-gradient(2px 2px at 45% 15%, rgba(255, 255, 255, 0.9) 0, transparent 50%),
+        radial-gradient(2px 2px at 35% 85%, rgba(255, 255, 255, 0.9) 0, transparent 50%);
+      mix-blend-mode: screen;
+      animation: twinkle 3s ease-in-out infinite alternate;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.3; transform: scale(1); }
+      to   { opacity: 0.9; transform: scale(1.02); }
+    }
+
+    .content {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      padding: 16px;
+    }
+
+    .headline {
+      font-size: clamp(1.9rem, 5vw, 2.6rem);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-shadow:
+        0 0 12px rgba(255, 155, 212, 0.9),
+        0 0 30px rgba(255, 155, 212, 0.7),
+        0 0 60px rgba(255, 155, 212, 0.5);
+    }
+
+    .fireworks-layer {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .firework {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff, transparent);
+      box-shadow: 0 0 12px #fff, 0 0 32px #ff9bd4, 0 0 50px #ffd27f;
+      opacity: 0;
+    }
+
+    .spark {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 8px #fff, 0 0 18px #ff9bd4;
+      opacity: 0;
+    }
+
+    @keyframes launch {
+      0%   { transform: translateY(100vh); opacity: 0; }
+      20%  { opacity: 1; }
+      60%  { transform: translateY(20vh); opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    @keyframes explode {
+      0% {
+        transform: translate(0, 0) scale(0.4);
+        opacity: 1;
+      }
+      70% {
+        opacity: 1;
+      }
+      100% {
+        transform: translate(var(--dx), var(--dy)) scale(1);
+        opacity: 0;
+      }
+    }
+
+    .footer-note {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 0.7rem;
+      color: rgba(255, 255, 255, 0.55);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      z-index: 3;
+    }
+
+    @media (max-width: 480px) {
+      .headline {
+        font-size: 1.7rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="stars-layer"></div>
+  <div class="twinkle"></div>
+  <div class="horizon"></div>
+
+  <div class="fireworks-layer" id="fireworksLayer"></div>
+
+  <main class="content" aria-live="polite">
+    <h1 class="headline">ENJOY THE FIREWORKS DISPLAY</h1>
+  </main>
+
+  <div class="footer-note">hgjshgjsdgkgkg</div>
+
+  <script>
+    const layer = document.getElementById("fireworksLayer");
+
+    // Vibrant color palette for fireworks
+    const fireworkColors = [
+      { main: '#ff4081', glow: '#ff9bd4', secondary: '#ff6b9d' }, // Pink
+      { main: '#4fc3f7', glow: '#81d4fa', secondary: '#29b6f6' }, // Blue
+      { main: '#66bb6a', glow: '#a5d6a7', secondary: '#43a047' }, // Green
+      { main: '#ffeb3b', glow: '#fff59d', secondary: '#fdd835' }, // Yellow
+      { main: '#ab47bc', glow: '#ce93d8', secondary: '#8e24aa' }, // Purple
+      { main: '#ff7043', glow: '#ffab91', secondary: '#ff5722' }, // Orange/Red
+      { main: '#26c6da', glow: '#80deea', secondary: '#00bcd4' }, // Cyan
+      { main: '#ef5350', glow: '#e57373', secondary: '#e53935' }, // Red
+      { main: '#42a5f5', glow: '#90caf9', secondary: '#1e88e5' }, // Light Blue
+      { main: '#ec407a', glow: '#f48fb1', secondary: '#e91e63' }, // Hot Pink
+    ];
+
+    function getRandomColor() {
+      return fireworkColors[Math.floor(Math.random() * fireworkColors.length)];
+    }
+
+    function createFirework() {
+      if (!layer) return;
+
+      const fw = document.createElement("div");
+      fw.className = "firework";
+      const color = getRandomColor();
+
+      const x = Math.random() * 100;
+      fw.style.left = x + "vw";
+      fw.style.bottom = "-10vh";
+      fw.style.boxShadow = `0 0 12px ${color.main}, 0 0 32px ${color.glow}, 0 0 50px ${color.secondary}`;
+
+      const launchDuration = 1000 + Math.random() * 600;
+      fw.style.animation = "launch " + launchDuration + "ms ease-out forwards";
+
+      layer.appendChild(fw);
+
+      const explodeAt = 0.6 * launchDuration;
+      setTimeout(() => {
+        fw.remove();
+        createExplosion(x, color);
+      }, explodeAt);
+    }
+
+    function createExplosion(xPercent, color) {
+      const numSparks = 32 + Math.floor(Math.random() * 24);
+      const centerY = 20 + Math.random() * 30; // vh
+
+      // Mix colors for more variety - some sparks use the main color, some use variations
+      const colorVariations = [
+        color.main,
+        color.glow,
+        color.secondary,
+        '#ffffff', // White sparks for contrast
+      ];
+
+      for (let i = 0; i < numSparks; i++) {
+        const spark = document.createElement("div");
+        spark.className = "spark";
+
+        spark.style.left = xPercent + "vw";
+        spark.style.top = centerY + "vh";
+
+        // Randomly assign color to each spark
+        const sparkColor = colorVariations[Math.floor(Math.random() * colorVariations.length)];
+        spark.style.background = sparkColor;
+        spark.style.boxShadow = `0 0 8px ${sparkColor}, 0 0 18px ${sparkColor}, 0 0 28px ${color.glow}`;
+
+        const angle = (Math.PI * 2 * i) / numSparks;
+        const distance = 12 + Math.random() * 18; // vh-ish
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance;
+
+        spark.style.setProperty("--dx", dx + "vh");
+        spark.style.setProperty("--dy", dy + "vh");
+
+        const dur = 1100 + Math.random() * 700;
+        spark.style.animation = "explode " + dur + "ms ease-out forwards";
+
+        layer.appendChild(spark);
+
+        setTimeout(() => spark.remove(), dur + 100);
+      }
+    }
+
+    // Occasional shooting star with random colors
+    function createShootingStar() {
+      if (!layer) return;
+      const star = document.createElement("div");
+      star.className = "spark";
+      star.style.left = "-10vw";
+      star.style.top = (10 + Math.random() * 40) + "vh";
+      star.style.width = "4px";
+      star.style.height = "4px";
+      
+      // Random colorful shooting star
+      const starColors = ['#fff', '#4fc3f7', '#ffeb3b', '#ff4081', '#66bb6a', '#ab47bc', '#26c6da'];
+      const starColor = starColors[Math.floor(Math.random() * starColors.length)];
+      star.style.boxShadow = `0 0 14px ${starColor}, 0 0 28px ${starColor}, 0 0 40px ${starColor}`;
+
+      const duration = 2000 + Math.random() * 1000;
+      star.style.transition = `transform ${duration}ms linear, opacity ${duration}ms linear`;
+      layer.appendChild(star);
+
+      requestAnimationFrame(() => {
+        star.style.transform = "translate(120vw, -20vh)";
+        star.style.opacity = "0";
+      });
+
+      setTimeout(() => star.remove(), duration + 200);
+    }
+
+    // Staggered fireworks for a rich, constant show
+    let started = false;
+    function startShow() {
+      if (started) return;
+      started = true;
+
+      // initial burst of multiple fireworks
+      for (let i = 0; i < 3; i++) {
+        setTimeout(createFirework, i * 200);
+      }
+
+      setInterval(() => {
+        // 2–3 fireworks each interval
+        const count = 2 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < count; i++) {
+          setTimeout(createFirework, i * 150);
+        }
+      }, 800 + Math.random() * 600);
+
+      // shooting stars
+      setInterval(() => {
+        if (Math.random() < 0.6) {
+          createShootingStar();
+        }
+      }, 2500);
+    }
+
+    window.addEventListener("load", startShow);
+  </script>
+</body>
+</html>
+
