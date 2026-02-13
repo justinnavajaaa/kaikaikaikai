@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="flower-styles.css">
     <link rel="icon" href="img/flowers.png" type="image/x-icon">
     <title>flowers</title>
 </head>
@@ -307,22 +307,39 @@
         </div>
       </div>
   </div>
-   
-   <script src="main.js"></script>
+    <script src="main.js"></script>
     <script>
       // Wait for all flower animations to complete (longest animation is ~4.8s)
       // Then wait 3 more seconds before redirecting to fireworks
       window.addEventListener("load", function() {
         // Wait for animations to complete (~5 seconds) + 3 seconds = 8 seconds total
         setTimeout(function () {
-          // Get the base path (repository root) for GitHub Pages compatibility
-          const currentPath = window.location.pathname;
-          // Remove '/flower/flower.html' to get root
-          const rootPath = currentPath.replace(/\/flower\/flower\.html$/, '');
-          // Use absolute path from repository root
-          window.location.href = rootPath + '/fireworks.html';
+          // Get the base URL and construct path to fireworks.html
+          const origin = window.location.origin;
+          const pathname = window.location.pathname;
+          
+          // Extract repository root path
+          let repoRoot = '';
+          if (pathname.includes('/flower.html')) {
+            // flower.html is in root
+            repoRoot = pathname.replace('/flower.html', '');
+          } else if (pathname.includes('/flower/')) {
+            // flower.html is in flower subfolder
+            repoRoot = pathname.substring(0, pathname.indexOf('/flower/'));
+          } else {
+            // Fallback: assume current directory
+            repoRoot = pathname.substring(0, pathname.lastIndexOf('/'));
+          }
+          
+          // Ensure repoRoot starts with / and doesn't end with /
+          if (!repoRoot.startsWith('/')) repoRoot = '/' + repoRoot;
+          if (repoRoot.endsWith('/') && repoRoot.length > 1) repoRoot = repoRoot.slice(0, -1);
+          
+          // Redirect to fireworks.html
+          window.location.href = origin + repoRoot + '/fireworks.html';
         }, 8000);
       });
     </script>
   </body>
 </html>
+
