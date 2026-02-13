@@ -129,7 +129,7 @@ function handleYesClick() {
                         sendBtn.disabled = false;
                         loveInput.value = "";
                         setTimeout(function () {
-                            window.location.href = "flower/flower.html";
+                            window.location.href = "flower.html";
                         }, 3000);
                     },
                     (error) => {
