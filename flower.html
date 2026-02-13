@@ -314,32 +314,31 @@
       window.addEventListener("load", function() {
         // Wait for animations to complete (~5 seconds) + 3 seconds = 8 seconds total
         setTimeout(function () {
-          // Get the base URL and construct path to fireworks.html
+          // Get the base URL and pathname
           const origin = window.location.origin;
           const pathname = window.location.pathname;
           
-          // Extract repository root path
+          // Extract repository root path for GitHub Pages
           let repoRoot = '';
-          if (pathname.includes('/flower.html')) {
-            // flower.html is in root
-            repoRoot = pathname.replace('/flower.html', '');
-          } else if (pathname.includes('/flower/')) {
-            // flower.html is in flower subfolder
+          
+          if (pathname.includes('/flower/')) {
+            // File is in flower subfolder: /repo-name/flower/flower.html
             repoRoot = pathname.substring(0, pathname.indexOf('/flower/'));
+          } else if (pathname.includes('/flower.html')) {
+            // File is flower.html in root: /repo-name/flower.html
+            repoRoot = pathname.replace('/flower.html', '');
           } else {
-            // Fallback: assume current directory
+            // Fallback: get directory path
             repoRoot = pathname.substring(0, pathname.lastIndexOf('/'));
           }
           
-          // Ensure repoRoot starts with / and doesn't end with /
+          // Ensure repoRoot starts with / and construct full URL
           if (!repoRoot.startsWith('/')) repoRoot = '/' + repoRoot;
-          if (repoRoot.endsWith('/') && repoRoot.length > 1) repoRoot = repoRoot.slice(0, -1);
+          const fireworksUrl = origin + repoRoot + '/fireworks.html';
           
-          // Redirect to fireworks.html
-          window.location.href = origin + repoRoot + '/fireworks.html';
+          window.location.href = fireworksUrl;
         }, 8000);
       });
     </script>
   </body>
 </html>
-
