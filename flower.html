@@ -308,13 +308,19 @@
       </div>
   </div>
     <script src="main.js"></script>
+   <script src="main.js"></script>
     <script>
       // Wait for all flower animations to complete (longest animation is ~4.8s)
       // Then wait 3 more seconds before redirecting to fireworks
       window.addEventListener("load", function() {
         // Wait for animations to complete (~5 seconds) + 3 seconds = 8 seconds total
         setTimeout(function () {
-          window.location.href = "fireworks.html";
+          // Get the base path (repository root) for GitHub Pages compatibility
+          const currentPath = window.location.pathname;
+          // Remove '/flower/flower.html' to get root
+          const rootPath = currentPath.replace(/\/flower\/flower\.html$/, '');
+          // Use absolute path from repository root
+          window.location.href = rootPath + '/fireworks.html';
         }, 8000);
       });
     </script>
